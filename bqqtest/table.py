@@ -180,16 +180,22 @@ class Table:
 class NamedQueryTable:
     _name = ""
     _query = ""
+    _table_map = {}
 
-    def __init__(self, name: str, query: str):
+    def __init__(self, name: str, query: str, table_map: dict):
         assert isinstance(name, str)
         assert isinstance(query, str)
-
+        assert type(table_map) is dict
+        
         self._name = name
         self._query = query
+        self._table_map = table_map
 
     def to_sql(self):
-        return "\n".join([f"{self._name} AS (", f"{self._query}", ")"])
+        query = self._query
+        for before, after in self._table_map.items():
+            query = re.sub(before, after, query)
+        return "\n".join([f"{self._name} AS (", f"{query}", ")"])
 
 
 class TemporaryTables:
@@ -319,7 +325,7 @@ class QueryTest:
 
         # FIXME: WITH句の解析を正規表現で強引に行っているため保守性が低い
         tables = tables + [
-            NamedQueryTable(name, query)
+            NamedQueryTable(name, query, table_map)
             for name, query in get_query_from_with_clause(_query["query"])
         ]
 

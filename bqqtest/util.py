@@ -14,7 +14,6 @@ def get_query_from_with_clause(sql: str):
     sql = regex.sub(
         r"/\*.*\*/", "", sql, flags=regex.MULTILINE | regex.IGNORECASE | regex.DOTALL
     )
-    print(sql)
 
     queries = regex.findall(f, sql)
 
