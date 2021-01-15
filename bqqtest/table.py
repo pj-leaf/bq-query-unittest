@@ -330,10 +330,16 @@ class QueryTest:
         ]
 
         query = regex.sub(
-            r"WITH\s+(?<name>\w+)\s+AS\s+(?<query>\((?:[^\(\)]+|(?&query))*\))",
+            r"WITH\s+(?<name>\w+)\s+(AS|as|As|aS)\s+(?<query>\((?:[^\(\)]+|(?&query))*\)\s*,?)",
             "",
             _query["query"],
         )
+        query = regex.sub(
+            r"(.*\s+(AS|as|As|aS)\s+(?<query>\((?:[^\(\)]+|(?&query))*\))\s*,?)*",
+            "",
+            query,
+        )
+        
         query = Query("ACTUAL", query, _query["params"], table_map)
         self._qlt = QueryLogicTest(_client, expected, tables, query)
 
